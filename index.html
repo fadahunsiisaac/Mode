@@ -1,0 +1,501 @@
+<html>
+<head>
+  <title>Interactive DOM Website</title>
+  <style>
+    * {
+      transition: all 0.3s ease;
+    }
+    
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+    }
+    
+    .navbar {
+      background: #2c3e50;
+      padding: 15px 30px;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    
+    .nav-links a {
+      color: white;
+      margin: 0 15px;
+      text-decoration: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+    }
+    
+    .nav-links a:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    
+    .nav-links a.active {
+      background: #3498db;
+    }
+    
+    .nav-controls button {
+      padding: 8px 15px;
+      margin-left: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    
+    #modeBtn {
+      background: #34495e;
+      color: white;
+    }
+    
+    #colorBtn {
+      background: #e74c3c;
+      color: white;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .section-title {
+      text-align: center;
+      margin: 30px 0 20px;
+      font-size: 2em;
+      color: #2c3e50;
+    }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      padding: 20px;
+    }
+    
+    .card {
+      background: #f8f9fa;
+      padding: 30px;
+      text-align: center;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transform: translateY(0);
+    }
+    
+    .card:hover {
+      c
+    }
+    
+    .card h3 {
+      margin-bottom: 15px;
+      color: #2c3e50;
+    }
+    
+    .card p {
+      color: #666;
+      margin-bottom: 20px;
+    }
+    
+    .card button {
+      padding: 10px 25px;
+      border: none;
+      border-radius: 5px;
+      background: #3498db;
+      color: white;
+      cursor: pointer;
+      font-size: 1em;
+      transition: all 0.3s;
+    }
+    
+    .card button:hover {
+      background: #2980b9;
+      transform: scale(1.05);
+    }
+    
+    .card button:active {
+      transform: scale(0.95);
+    }
+    
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #2ecc71;
+      color: white;
+      padding: 15px 25px;
+      border-radius: 5px;
+      display: none;
+      animation: slideIn 0.3s ease;
+      z-index: 1000;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    .stats-panel {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 20px 0;
+      display: flex;
+      justify-content: space-around;
+    }
+    
+    .stat-item {
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 2em;
+      font-weight: bold;
+    }
+    
+    .stat-label {
+      font-size: 0.9em;
+      opacity: 0.9;
+    }
+    
+    .footer {
+      background: #2c3e50;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      margin-top: 40px;
+    }
+    
+    /* Dark mode styles */
+    body.dark-mode {
+      background: #1a1a1a;
+    }
+    
+    body.dark-mode .card {
+      background: #2d2d2d;
+    }
+    
+    body.dark-mode .card h3,
+    body.dark-mode .card p {
+      color: #fff;
+    }
+    
+    body.dark-mode .section-title {
+      color: #fff;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NOTIFICATION -->
+  <div id="notification" class="notification"></div>
+
+  <!-- NAVBAR -->
+  <div class="navbar">
+    <h2 id="siteTitle" onclick="changeTitle()" style="cursor:pointer;">✨ MySite</h2>
+    
+    <div class="nav-links">
+      <a href="#" class="nav-link active" onclick="setActive(this)">Home</a>
+      <a href="#" class="nav-link" onclick="setActive(this)">About</a>
+      <a href="#" class="nav-link" onclick="setActive(this)">Services</a>
+      <a href="#" class="nav-link" onclick="setActive(this)">Contact</a>
+    </div>
+    
+    <div class="nav-controls">
+      <button id="modeBtn" onclick="toggleDarkMode()">🌙 Dark Mode</button>
+      <button id="colorBtn" onclick="randomHeaderColor()">🎨 Color</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- STATS PANEL -->
+    <div class="stats-panel" id="statsPanel">
+      <div class="stat-item">
+        <div class="stat-value" id="productCount">0</div>
+        <div class="stat-label">Products</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="serviceCount">0</div>
+        <div class="stat-label">Services</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="totalClicks">0</div>
+        <div class="stat-label">Total Clicks</div>
+      </div>
+    </div>
+
+    <!-- PRODUCTS GRID -->
+    <h2 class="section-title">🔥 Products</h2>
+
+    <div class="grid" id="productsGrid">
+      
+      <div class="card" onclick="selectCard(this)">
+        <h3>Premium Product</h3>
+        <p>High quality premium product with warranty</p>
+        <p style="font-size:1.5em; color:#27ae60;">$99.99</p>
+        <button onclick="buyProduct(this, 'Premium Product', 99.99); event.stopPropagation();">Buy Now</button>
+      </div>
+
+      <div class="card" onclick="selectCard(this)">
+        <h3>Standard Product</h3>
+        <p>Reliable standard product for daily use</p>
+        <p style="font-size:1.5em; color:#27ae60;">$49.99</p>
+        <button onclick="buyProduct(this, 'Standard Product', 49.99); event.stopPropagation();">Buy Now</button>
+      </div>
+
+      <div class="card" onclick="selectCard(this)">
+        <h3>Basic Product</h3>
+        <p>Essential product for beginners</p>
+        <p style="font-size:1.5em; color:#27ae60;">$19.99</p>
+        <button onclick="buyProduct(this, 'Basic Product', 19.99); event.stopPropagation();">Buy Now</button>
+      </div>
+
+    </div>
+
+    <!-- SERVICES GRID -->
+    <h2 class="section-title">⚡ Services</h2>
+
+    <div class="grid" id="servicesGrid">
+      
+      <div class="card" onclick="selectCard(this)">
+        <h3>Consulting</h3>
+        <p>Expert advice for your business</p>
+        <p style="font-size:1.5em; color:#27ae60;">$199/hr</p>
+        <button onclick="bookService(this, 'Consulting'); event.stopPropagation();">Book Now</button>
+      </div>
+
+      <div class="card" onclick="selectCard(this)">
+        <h3>Development</h3>
+        <p>Custom software development</p>
+        <p style="font-size:1.5em; color:#27ae60;">$149/hr</p>
+        <button onclick="bookService(this, 'Development'); event.stopPropagation();">Book Now</button>
+      </div>
+
+      <div class="card" onclick="selectCard(this)">
+        <h3>Training</h3>
+        <p>Professional training sessions</p>
+        <p style="font-size:1.5em; color:#27ae60;">$99/hr</p>
+        <button onclick="bookService(this, 'Training'); event.stopPropagation();">Book Now</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <p>&copy; 2024 MySite. All rights reserved. | <span onclick="resetSite()" style="cursor:pointer;">Reset Site</span></p>
+  </div>
+
+  <!-- JAVASCRIPT DOM -->
+  <script>
+    // Global variables
+    let totalClicks = 0;
+    let products = 3;
+    let services = 3;
+    
+    // Update stats on load
+    updateStats();
+
+    // Show notification function
+    function showNotification(message, isSuccess = true) {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.style.background = isSuccess ? '#2ecc71' : '#e74c3c';
+      notification.style.display = 'block';
+      
+      setTimeout(() => {
+        notification.style.display = 'none';
+      }, 3000);
+    }
+
+    // Buy product function
+    function buyProduct(btn, productName, price) {
+      btn.innerText = "✓ Added to Cart!";
+      btn.style.background = "#27ae60";
+      
+      setTimeout(() => {
+        btn.innerText = "Buy Now";
+        btn.style.background = "#3498db";
+      }, 2000);
+      
+      totalClicks++;
+      showNotification(`🛒 ${productName} added to cart! $${price}`);
+      updateStats();
+    }
+
+    // Book service function
+    function bookService(btn, serviceName) {
+      btn.innerText = "✓ Booked!";
+      btn.style.background = "#27ae60";
+      
+      setTimeout(() => {
+        btn.innerText = "Book Now";
+        btn.style.background = "#3498db";
+      }, 2000);
+      
+      totalClicks++;
+      showNotification('📅 ${serviceName} service booked!');
+      updateStats();
+    }
+
+    // Select card function
+    function selectCard(card) {
+      card.style.background = "#e8f4f8";
+      setTimeout(() => {
+        card.style.background = "#f8f9fa";
+      }, 200);
+      totalClicks++;
+      updateStats();
+    }
+
+    // Dark mode toggle
+    function toggleDarkMode() {
+      const body = document.body;
+      const modeBtn = document.getElementById("modeBtn");
+      
+      body.classList.toggle('dark-mode');
+      
+      if (body.classList.contains('dark-mode')) {
+        modeBtn.innerHTML = "☀️ Light Mode";
+        showNotification("Dark mode enabled");
+      } else {
+        modeBtn.innerHTML = "🌙 Dark Mode";
+        showNotification("Light mode enabled");
+      }
+    }
+
+    // Random header color
+    function randomHeaderColor() {
+      const navbar = document.querySelector('.navbar');
+      const colors = ['#2c3e50', '#8e44ad', '#16a085', '#27ae60', '#2980b9', '#d35400', '#c0392b'];
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      
+      navbar.style.background = randomColor;
+      showNotification('🎨 Navbar color changed!');
+    }
+
+    // Change site title
+    function changeTitle() {
+      const titles = ['✨ MySite', '🚀 Awesome Site', '💡 Creative Hub', '🌟 Mega Site', '🎯 Target Site'];
+      const currentTitle = document.getElementById('siteTitle');
+      const randomTitle = titles[Math.floor(Math.random() * titles.length)];
+      
+      currentTitle.textContent = randomTitle;
+      showNotification('📝 Title changed to: ${randomTitle}');
+    }
+
+    // Set active nav link
+    function setActive(link) {
+      // Remove active class from all links
+      document.querySelectorAll('.nav-link').forEach(l => {
+        l.classList.remove('active');
+      });
+      
+      // Add active class to clicked link
+      link.classList.add('active');
+      showNotification('📍 Navigated to ${link.textContent}');
+    }
+
+    // Update statistics
+    function updateStats() {
+      document.getElementById('productCount').textContent = products;
+      document.getElementById('serviceCount').textContent = services;
+      document.getElementById('totalClicks').textContent = totalClicks;
+    }
+
+    // Reset site
+    function resetSite() {
+      // Reset navbar color
+      document.querySelector('.navbar').style.background = '#2c3e50';
+      
+      // Reset site title
+      document.getElementById('siteTitle').textContent = '✨ MySite';
+      
+      // Remove dark mode
+      document.body.classList.remove('dark-mode');
+      document.getElementById('modeBtn').innerHTML = '🌙 Dark Mode';
+      
+      // Reset stats
+      totalClicks = 0;
+      products = 3;
+      services = 3;
+      updateStats();
+      
+      // Reset all buttons
+      document.querySelectorAll('.card button').forEach(btn => {
+        btn.innerText = btn.innerText.includes('Buy') ? 'Buy Now' : 'Book Now';
+        btn.style.background = '#3498db';
+      });
+      
+      // Reset active nav
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      document.querySelector('.nav-link').classList.add('active');
+      
+      showNotification('✨ Site has been reset!');
+    }
+
+    // Add keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+      if (e.ctrlKey && e.key === 'd') {
+        e.preventDefault();
+        toggleDarkMode();
+      }
+      if (e.ctrlKey && e.key === 'r') {
+        e.preventDefault();
+        resetSite();
+      }
+    });
+
+    // Add product function (dynamic)
+    function addProduct() {
+      const productName = prompt("Enter product name:");
+      if (productName) {
+        const price = prompt("Enter price:");
+        if (price) {
+          products++;
+          showNotification('✅ New product "${productName}" added!');
+          updateStats();
+        }
+      }
+    }
+
+    // Add floating action button
+    const fab = document.createElement('button');
+    fab.innerHTML = '+';
+    fab.style.cssText = `
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #3498db;
+      color: white;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      z-index: 999;
+    `;
+    fab.onclick = addProduct;
+    fab.title = "Add New Product";
+    document.body.appendChild(fab);
+
+    // Initialize tooltips
+    console.log('✨ Site loaded successfully!');
+  </script>
+
+</body>
+</html>
